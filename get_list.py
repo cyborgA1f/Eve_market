@@ -52,7 +52,7 @@ def data_sqlite():
 def filling_DB():
     data_sqlite()
     a = lerning_XML()
-    buy = a.findall('buy_orders/order/')
+    buy = a.findall('quicklook/buy_orders/order')
 
     conn = sqlite3.connect('Eve_online.db')
     c=conn.cursor()
@@ -62,6 +62,7 @@ def filling_DB():
         station_name = ord.findtext('station_name')
         security = ord.findtext('security')
         region = ord.findtext('region')
+        print(region)
         tablet = [int(region), float(security), str(station_name) ,float(price)]
         c.execute("INSERT INTO Buy_order(Region, Security, Station, Price) VALUES (?, ?, ?, ?)",tablet)
     conn.commit()
