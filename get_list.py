@@ -9,8 +9,8 @@ def lerning_XML():
     response = urllib.request.urlopen(url)
     data = response.read()
     tree = ET.XML(data)
-    results = tree.findall('quicklook/')
-    return results
+    #results = tree.findall('quicklook/')
+    return tree
 
 def data_sqlite():
     conn = sqlite3.connect('Eve_online.db')
