@@ -1,6 +1,6 @@
 import urllib.request
 import xml.etree.ElementTree as ET
-from time import gmtime, strftime
+#from time import gmtime, strftime
 import sqlite3
 
 def lerning_XML():
@@ -9,7 +9,6 @@ def lerning_XML():
     response = urllib.request.urlopen(url)
     data = response.read()
     tree = ET.XML(data)
-    #results = tree.findall('quicklook/')
     return tree
 
 def data_sqlite():
@@ -53,6 +52,7 @@ def filling_DB():
     data_sqlite()
     a = lerning_XML()
     buy = a.findall('quicklook/buy_orders/order')
+    sall = a.findall('quicklook/sell_orders/order')
 
     conn = sqlite3.connect('Eve_online.db')
     c=conn.cursor()
@@ -62,9 +62,15 @@ def filling_DB():
         station_name = ord.findtext('station_name')
         security = ord.findtext('security')
         region = ord.findtext('region')
-        print(region)
         tablet = [int(region), float(security), str(station_name) ,float(price)]
         c.execute("INSERT INTO Buy_order(Region, Security, Station, Price) VALUES (?, ?, ?, ?)",tablet)
+    for ord in sall:
+        price = ord.findtext('price')
+        station_name = ord.findtext('station_name')
+        security = ord.findtext('security')
+        region = ord.findtext('region')
+        tablet = [int(region), float(security), str(station_name) ,float(price)]
+        c.execute("INSERT INTO Sall_order(Region, Security, Station, Price) VALUES (?, ?, ?, ?)",tablet)
     conn.commit()
     c.close()
     conn.close()
