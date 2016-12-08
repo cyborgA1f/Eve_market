@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import urllib.request
 import xml.etree.ElementTree as ET
 #from time import gmtime, strftime
@@ -60,9 +63,7 @@ def filling_DB(): #Заполнение таблици данными
     conn.close()
 
 def main():
-    #data_sqlite()
     filling_DB()
-    #lerning_XML()
 
 if __name__ == '__main__':
     main()
