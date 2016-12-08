@@ -14,14 +14,14 @@ def lerning_XML():
 def data_sqlite():
     conn = sqlite3.connect('Eve_online.db')
     c = conn.cursor()
-    """"
+
     try:
-        c.execute("DROP TABLE Sall_order")
-        c.execute("DROP TABLE Buy_order")
-        c.execute("DROP TABLE marker")
+        c.execute("DROP TABLE IF EXISTS Sall_order")
+        c.execute("DROP TABLE IF EXISTS Buy_order")
+        c.execute("DROP TABLE IF EXISTS market")
     except sqlite3.OperationalError as drop:
        print(drop)
-    """
+
     try:
         c.execute("CREATE TABLE market("
               "Id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"
@@ -64,11 +64,11 @@ def filling_DB():
         region = ord.findtext('region')
         tablet = [int(region), float(security), str(station_name) ,float(price)]
         c.execute("INSERT INTO Buy_order(Region, Security, Station, Price) VALUES (?, ?, ?, ?)",tablet)
-    for ord in sall:
-        price = ord.findtext('price')
-        station_name = ord.findtext('station_name')
-        security = ord.findtext('security')
-        region = ord.findtext('region')
+    for ordd in sall:
+        price = ordd.findtext('price')
+        station_name = ordd.findtext('station_name')
+        security = ordd.findtext('security')
+        region = ordd.findtext('region')
         tablet = [int(region), float(security), str(station_name) ,float(price)]
         c.execute("INSERT INTO Sall_order(Region, Security, Station, Price) VALUES (?, ?, ?, ?)",tablet)
     conn.commit()
