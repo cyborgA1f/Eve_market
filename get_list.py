@@ -11,44 +11,28 @@ def lerning_XML():
     tree = ET.XML(data)
     return tree
 
-def data_sqlite():
+def data_sqlite():#создание таблици
     conn = sqlite3.connect('Eve_online.db')
     c = conn.cursor()
 
     try:
         c.execute("DROP TABLE IF EXISTS Sall_order")
         c.execute("DROP TABLE IF EXISTS Buy_order")
-        c.execute("DROP TABLE IF EXISTS market")
+        #c.execute("DROP TABLE IF EXISTS market")
     except sqlite3.OperationalError as drop:
        print(drop)
 
     try:
-        c.execute("CREATE TABLE market("
-              "Id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"
-              " ItemId INTEGER,"
-              " SallId INTEGER REFERENCES Sall_order (Id),"
-              " BuyId  INTEGER REFERENCES Buy_order (Id))")
-
-        c.execute("CREATE TABLE Sall_order("
-              "Id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"
-              " Region INTEGER,"
-              " Security FLOAT,"
-              " Station STRING, "
-              "Price FLOAT)")
-
-        c.execute("CREATE TABLE Buy_order("
-              "Id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"
-              " Region INTEGER,"
-              " Security FLOAT,"
-              " Station STRING, "
-              "Price FLOAT)")
+        c.execute("CREATE TABLE IF NOT EXISTS market(Id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, ItemId INTEGER, SallId INTEGER REFERENCES Sall_order (Id), BuyId  INTEGER REFERENCES Buy_order (Id))")
+        c.execute("CREATE TABLE IF NOT EXISTS Sall_order(Id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, Region INTEGER, Security FLOAT, Station STRING, Price FLOAT)")
+        c.execute("CREATE TABLE IF NOT EXISTS Buy_order(Id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, Region INTEGER, Security FLOAT, Station STRING, Price FLOAT)")
     except sqlite3.OperationalError as creat:
         print(creat)
     conn.commit()
     c.close()
     conn.close()
 
-def filling_DB():
+def filling_DB(): #Заполнение таблици данными
     data_sqlite()
     a = lerning_XML()
     buy = a.findall('quicklook/buy_orders/order')
