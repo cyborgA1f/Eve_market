@@ -17,21 +17,14 @@ def lerning_XML():
 def data_sqlite():#создание таблици
     conn = sqlite3.connect('Eve_online.db')
     c = conn.cursor()
-
-    try:
-        c.execute("DROP TABLE IF EXISTS Sall_order")
-        c.execute("DROP TABLE IF EXISTS Buy_order")
-        #c.execute("DROP TABLE IF EXISTS market")
-    except sqlite3.OperationalError as drop:
-       print(drop)
-
-    try:
-        c.execute("CREATE TABLE IF NOT EXISTS market(Id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, ItemId INTEGER, SallId INTEGER REFERENCES Sall_order (Id), BuyId  INTEGER REFERENCES Buy_order (Id))")
-        c.execute("CREATE TABLE IF NOT EXISTS Sall_order(Id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, Region INTEGER, Security FLOAT, Station STRING, Price FLOAT)")
-        c.execute("CREATE TABLE IF NOT EXISTS Buy_order(Id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, Region INTEGER, Security FLOAT, Station STRING, Price FLOAT)")
-    except sqlite3.OperationalError as creat:
-        print(creat)
-    conn.commit()
+    c.execute("DROP TABLE IF EXISTS Sall_order")
+    c.execute("DROP TABLE IF EXISTS Buy_order")
+    c.execute("CREATE TABLE IF NOT EXISTS market(Id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, Item_ID INTEGER REFERENCES Item (Id), Sall_ID INTEGER REFERENCES Sall_order (Id), Buy_ID  INTEGER REFERENCES Buy_order (Id))")
+    c.execute("CREATE TABLE IF NOT EXISTS Sall_order(Id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, Region INTEGER, Security FLOAT, Station STRING, Price FLOAT)")
+    c.execute("CREATE TABLE IF NOT EXISTS Buy_order(Id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, Region INTEGER, Security FLOAT, Station STRING, Price FLOAT)")
+    c.execute("CREATE TABLE IF NOT EXISTS Region(Id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, Name STRING)")
+    c.execute("CREATE TABLE IF NOT EXISTS Security(Id INTEGER, Status FLOAT)")
+    c.execute("CREATE TABLE IF NOT EXISTS Station(Id INTEGER PRIMARY KEY NOT NULL, Region_ID INTEGER REFERENCES Region (Id), Security_ID INTEGER REFERENCES Security (Id), Name STRING)")
     c.close()
     conn.close()
 
@@ -40,6 +33,8 @@ def filling_DB(): #Заполнение таблици данными
     a = lerning_XML()
     buy = a.findall('quicklook/buy_orders/order')
     sall = a.findall('quicklook/sell_orders/order')
+
+    cread_tablet = ['Buy_order', 'Sall_order']
 
     conn = sqlite3.connect('Eve_online.db')
     c=conn.cursor()
@@ -50,7 +45,7 @@ def filling_DB(): #Заполнение таблици данными
         security = ord.findtext('security')
         region = ord.findtext('region')
         tablet = [int(region), float(security), str(station_name) ,float(price)]
-        c.execute("INSERT INTO Buy_order(Region, Security, Station, Price) VALUES (?, ?, ?, ?)",tablet)
+        c.execute("INSERT INTO Buy_order(Region, Security, Station, Price) VALUES (?, ?, ?, ?)", tablet)
     for ordd in sall:
         price = ordd.findtext('price')
         station_name = ordd.findtext('station_name')
@@ -58,7 +53,6 @@ def filling_DB(): #Заполнение таблици данными
         region = ordd.findtext('region')
         tablet = [int(region), float(security), str(station_name) ,float(price)]
         c.execute("INSERT INTO Sall_order(Region, Security, Station, Price) VALUES (?, ?, ?, ?)",tablet)
-    conn.commit()
     c.close()
     conn.close()
 
