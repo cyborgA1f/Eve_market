@@ -3,18 +3,20 @@
 
 import urllib.request
 import xml.etree.ElementTree as ET
-#from time import gmtime, strftime
 import sqlite3
 
-def lerning_XML():
+def lerning_XML(): #Получение полного списка ордеров
+    print("Получаем список:", end='')
     tag = 34 # input('enter tag:')
     url = 'https://api.eve-central.com/api/quicklook?typeid='+str(tag)
     response = urllib.request.urlopen(url)
     data = response.read()
+    print("Ok")
     tree = ET.XML(data)
     return tree
 
-def data_sqlite():#создание таблици
+def creating_tables():#создание таблици в sylite
+    print('Создание таблици:', end='')
     conn = sqlite3.connect('Eve_online.db')
     c = conn.cursor()
     c.execute("DROP TABLE IF EXISTS Sall_order")
@@ -28,13 +30,15 @@ def data_sqlite():#создание таблици
     conn.commit()
     c.close()
     conn.close()
+    print('Ok')
 
-def filling_DB2(): #тест ситаксиса
-    data_sqlite()
+def filling_DB(): #Заполнение даных полученых с сайта eve-central.com
+    creating_tables()
     a = lerning_XML()
     buy = a.findall('quicklook/buy_orders/order')
     sall = a.findall('quicklook/sell_orders/order')
 
+    print("Заполняем таблицу:", end=" ")
     conn = sqlite3.connect('Eve_online.db')
     c = conn.cursor()
     orders = {"Buy_order": buy, "Sall_order": sall}
@@ -49,9 +53,34 @@ def filling_DB2(): #тест ситаксиса
     conn.commit()
     c.close()
     conn.close()
+    print("OK")
+
+def Instrt_data(): #Выборка с базы данных
+    a = lerning_XML()
+    info = a.findall('quicklook')
+    for item in info:
+        itemname = item.findtext('itemname')
+        print(itemname)
+    conn=sqlite3.connect('Eve_online.db')
+    c=conn.cursor()
+    c.execute('select * from Sall_order')
+    data = c.fetchall()
+    a=0
+    for dat in data:
+        sell = (dat[-1])
+        a+=sell
+    f=a/len(data)
+    print("Средняя цена:", round(f, 2))
 
 def main():
-    filling_DB2()
+    print("Заполнения базы данных(1)\nПолучения получение среднего значения(2)\nВыход(0)")
+    a = int(input("Введите значение:"))
+    if a == 1:
+        filling_DB()
+    elif a== 2:
+        Instrt_data()
+    else:
+        print("exit")
 
 if __name__ == '__main__':
     main()
